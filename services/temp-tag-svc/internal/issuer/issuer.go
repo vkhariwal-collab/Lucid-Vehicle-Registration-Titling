@@ -26,9 +26,6 @@ func (i *Issuer) Issue(req model.Request) (model.Result, error) {
 	if !vinRE.MatchString(req.VIN) {
 		return rejected([]string{"invalid_vin"}), nil
 	}
-	if req.Attempt == 0 {
-		req.Attempt = 1
-	}
 	r := rules.For(req.Jurisdiction, i.opt)
 
 	var errs []string

@@ -13,3 +13,7 @@ ON,lease,name present,yes,upper-case,1,issued,ppsa_registration_required;lessor_
 ON,cash,none,yes,lower-case,1,rejected,invalid_postal_code,0,0,,ON-POSTAL-CASE
 NY (any unsupported),cash,none,n/a,n/a,1,issued,unsupported_jurisdiction_default_rules,30,0,USD,DEFAULT-RULES-FALLTHROUGH
 any,any,any,any,any,any,rejected,invalid_vin (short-circuit),0,0,,
+CA,cash,none,yes,n/a,0,issued,tag number hashed with attempt 0 (only nil defaults to 1),90,0,USD,ATTEMPT-ZERO-KEPT
+CA,cash,none,yes,n/a,1,issued,requested_at date-time: calendar date as written; offset ignored,90,0,USD,DATETIME-OFFSET-IGNORED
+TX,finance,name = U+00A0 only,yes,n/a,1,issued,,60,500,USD,RUBY-STRIP-WHITESPACE
+TX,finance,name = NUL only,yes,n/a,1,rejected,lienholder_required,0,0,,RUBY-STRIP-WHITESPACE

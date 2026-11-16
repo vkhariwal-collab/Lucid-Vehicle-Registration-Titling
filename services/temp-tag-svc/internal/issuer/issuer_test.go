@@ -23,7 +23,7 @@ func TestIssue(t *testing.T) {
 		{"reasons keep legacy order", model.Request{VIN: "5L1RA1AA0SA000105", Jurisdiction: "TX", PurchaseType: "finance", RequestedAt: "2026-11-05"}, "rejected", "",
 			[]string{"missing_document:purchase_agreement", "missing_document:form_130u", "missing_document:lien_agreement", "lienholder_required"}},
 		{"unknown jurisdiction -> default 30d", model.Request{VIN: "5L1RA1AA0SA000401", Jurisdiction: "NY", PurchaseType: "cash", RequestedAt: "2026-11-07"}, "issued", "2026-12-07", nil},
-		{"attempt 0 treated as 1", model.Request{VIN: "5L1RA1AA0SA000101", Jurisdiction: "CA", PurchaseType: "cash", Documents: ca, RequestedAt: "2026-11-03", Attempt: 0}, "issued", "2027-02-01", nil},
+		{"datetime requested_at uses date as written", model.Request{VIN: "5L1RA1AA0SA000101", Jurisdiction: "CA", PurchaseType: "cash", Documents: ca, RequestedAt: "2026-11-03T23:30:00-08:00", Attempt: 1}, "issued", "2027-02-01", nil},
 	}
 	iss := New(rules.Options{})
 	for _, tt := range tests {
@@ -49,5 +49,23 @@ func TestInvalidDateIsError(t *testing.T) {
 	_, err := New(rules.Options{}).Issue(model.Request{VIN: "5L1RA1AA0SA000401", Jurisdiction: "NY", RequestedAt: "11/07/2026"})
 	if err == nil {
 		t.Fatal("expected error for malformed date")
+	}
+}
+
+// Legacy keeps an explicit attempt of 0 (registration.rb:11), so it feeds the tag hash as-is.
+func TestTagNumberUsesAttemptAsGiven(t *testing.T) {
+	base := model.Request{VIN: "5L1RA1AA0SA000202", Jurisdiction: "CA", PurchaseType: "cash",
+		Documents: []string{"purchase_agreement", "odometer_disclosure"}, RequestedAt: "2026-11-25"}
+	iss := New(rules.Options{})
+	for attempt, want := range map[int]string{0: "CA-DC97146C", 1: "CA-22F0A8CA"} {
+		r := base
+		r.Attempt = attempt
+		got, err := iss.Issue(r)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if *got.TagNumber != want {
+			t.Errorf("attempt %d: tag = %s, want %s", attempt, *got.TagNumber, want)
+		}
 	}
 }

@@ -1,8 +1,9 @@
 # Parity report: legacy Ruby vs Go temp-tag-svc
 
-- Generated: 2026-11-16T01:16:34Z
+- Generated: 2026-11-16T06:39:25Z
 - Requests: 500 (seed 42, synthetic)
 - Go options: FixTXResubmissionExpiry=false
+- Edge-case inputs: attempt=0=15, lienholder name whitespace-only=33, requested_at with time=38
 - **Parity: 500/500 (100.00%)**
 
 | Jurisdiction | Requests | Mismatches |

@@ -25,7 +25,7 @@ func (txRules) RequiredDocuments(r model.Request) []string {
 }
 
 func (txRules) LienErrors(r model.Request) []string {
-	if r.Financed() && (r.Lienholder == nil || strings.TrimSpace(r.Lienholder.Name) == "") {
+	if r.Financed() && (r.Lienholder == nil || rubyStrip(r.Lienholder.Name) == "") {
 		return []string{"lienholder_required"}
 	}
 	return nil
@@ -44,3 +44,8 @@ func (t txRules) BaseDate(r model.Request) (time.Time, error) {
 	}
 	return model.ParseDate(r.RequestedAt)
 }
+
+// rubyStrip trims the characters Ruby's String#strip removes (NUL, \t, \n, \v,
+// \f, \r, space). strings.TrimSpace differs: it trims Unicode spaces such as
+// U+00A0 and keeps NUL (legacy tx_rules.rb:16).
+func rubyStrip(s string) string { return strings.Trim(s, "\x00\t\n\v\f\r ") }
