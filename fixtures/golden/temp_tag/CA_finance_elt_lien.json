@@ -1,0 +1,42 @@
+{
+  "name": "CA_finance_elt_lien",
+  "description": "Financed purchase; ELT lienholder present",
+  "synthetic": true,
+  "tags": [
+
+  ],
+  "input": {
+    "vin": "5L1RA1AA0SA000102",
+    "jurisdiction": "CA",
+    "delivery_jurisdiction": "CA",
+    "purchase_type": "finance",
+    "lienholder": {
+      "name": "Lucid Financial Services",
+      "elt_id": "ELT-CA-0042"
+    },
+    "documents": [
+      "purchase_agreement",
+      "odometer_disclosure",
+      "lien_agreement"
+    ],
+    "customer": {
+      "postal_code": "92626"
+    },
+    "requested_at": "2026-11-03",
+    "attempt": 1
+  },
+  "expected": {
+    "status": "issued",
+    "tag_number": "CA-AD675CF9",
+    "expires_on": "2027-02-01",
+    "valid_days": 90,
+    "fee_cents": 0,
+    "currency": "USD",
+    "reasons": [
+
+    ],
+    "flags": [
+
+    ]
+  }
+}

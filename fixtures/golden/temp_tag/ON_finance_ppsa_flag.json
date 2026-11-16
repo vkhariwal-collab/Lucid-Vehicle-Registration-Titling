@@ -1,0 +1,40 @@
+{
+  "name": "ON_finance_ppsa_flag",
+  "description": "Financed purchase, Ontario: PPSA flag instead of ELT",
+  "synthetic": true,
+  "tags": [
+
+  ],
+  "input": {
+    "vin": "5L1RA1AA0SA000302",
+    "jurisdiction": "ON",
+    "delivery_jurisdiction": "ON",
+    "purchase_type": "finance",
+    "lienholder": {
+      "name": "Lucid Financial Services Canada"
+    },
+    "documents": [
+      "bill_of_sale",
+      "proof_of_insurance"
+    ],
+    "customer": {
+      "postal_code": "K1A0B1"
+    },
+    "requested_at": "2026-11-06",
+    "attempt": 1
+  },
+  "expected": {
+    "status": "issued",
+    "tag_number": "ON-494CA521",
+    "expires_on": "2026-11-16",
+    "valid_days": 10,
+    "fee_cents": 3200,
+    "currency": "CAD",
+    "reasons": [
+
+    ],
+    "flags": [
+      "ppsa_registration_required"
+    ]
+  }
+}

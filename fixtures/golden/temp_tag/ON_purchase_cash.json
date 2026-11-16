@@ -1,0 +1,37 @@
+{
+  "name": "ON_purchase_cash",
+  "description": "Cash purchase, Ontario (CAD)",
+  "synthetic": true,
+  "tags": [
+
+  ],
+  "input": {
+    "vin": "5L1RA1AA0SA000301",
+    "jurisdiction": "ON",
+    "delivery_jurisdiction": "ON",
+    "purchase_type": "cash",
+    "documents": [
+      "bill_of_sale",
+      "proof_of_insurance"
+    ],
+    "customer": {
+      "postal_code": "M5V 3L9"
+    },
+    "requested_at": "2026-11-06",
+    "attempt": 1
+  },
+  "expected": {
+    "status": "issued",
+    "tag_number": "ON-CE4A1ABE",
+    "expires_on": "2026-11-16",
+    "valid_days": 10,
+    "fee_cents": 3200,
+    "currency": "CAD",
+    "reasons": [
+
+    ],
+    "flags": [
+
+    ]
+  }
+}

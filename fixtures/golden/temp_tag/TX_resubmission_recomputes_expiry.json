@@ -1,0 +1,39 @@
+{
+  "name": "TX_resubmission_recomputes_expiry",
+  "description": "Resubmission 20 days later: legacy recomputes expiry from new request date, ignoring original_issued_at",
+  "synthetic": true,
+  "tags": [
+    "legacy_quirk:TX-RESUBMIT-EXPIRY",
+    "needs_sme_review"
+  ],
+  "input": {
+    "vin": "5L1RA1AA0SA000202",
+    "jurisdiction": "TX",
+    "delivery_jurisdiction": "TX",
+    "purchase_type": "cash",
+    "documents": [
+      "purchase_agreement",
+      "form_130u"
+    ],
+    "customer": {
+      "postal_code": "78701"
+    },
+    "requested_at": "2026-11-25",
+    "attempt": 2,
+    "original_issued_at": "2026-11-05"
+  },
+  "expected": {
+    "status": "issued",
+    "tag_number": "TX-A025AED4",
+    "expires_on": "2027-01-24",
+    "valid_days": 60,
+    "fee_cents": 500,
+    "currency": "USD",
+    "reasons": [
+
+    ],
+    "flags": [
+      "resubmission"
+    ]
+  }
+}

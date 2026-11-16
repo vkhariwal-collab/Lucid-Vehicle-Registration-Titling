@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: temp-tag-svc
+  labels: { app: temp-tag-svc, part-of: registration }
+spec:
+  replicas: 3
+  revisionHistoryLimit: 5
+  strategy:
+    type: RollingUpdate
+    rollingUpdate: { maxUnavailable: 0, maxSurge: 1 }
+  selector:
+    matchLabels: { app: temp-tag-svc }
+  template:
+    metadata:
+      labels: { app: temp-tag-svc, part-of: registration }
+      annotations:
+        sidecar.istio.io/inject: "true"
+    spec:
+      serviceAccountName: temp-tag-svc
+      automountServiceAccountToken: false
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile: { type: RuntimeDefault }
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: topology.kubernetes.io/zone
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector: { matchLabels: { app: temp-tag-svc } }
+      containers:
+        - name: app
+          image: registry.example.com/registration/temp-tag-svc:0.1.0
+          ports: [{ name: http, containerPort: 8080 }]
+          env:
+            - { name: ADDR, value: ":8080" }
+            - { name: FIX_TX_RESUBMISSION_EXPIRY, value: "false" }
+          readinessProbe: { httpGet: { path: /readyz, port: http }, periodSeconds: 5 }
+          livenessProbe: { httpGet: { path: /healthz, port: http }, periodSeconds: 10 }
+          resources:
+            requests: { cpu: 100m, memory: 64Mi }
+            limits: { memory: 256Mi }
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: { drop: [ALL] }

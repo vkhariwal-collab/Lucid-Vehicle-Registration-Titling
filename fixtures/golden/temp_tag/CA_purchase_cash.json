@@ -1,0 +1,37 @@
+{
+  "name": "CA_purchase_cash",
+  "description": "Cash purchase, California",
+  "synthetic": true,
+  "tags": [
+
+  ],
+  "input": {
+    "vin": "5L1RA1AA0SA000101",
+    "jurisdiction": "CA",
+    "delivery_jurisdiction": "CA",
+    "purchase_type": "cash",
+    "documents": [
+      "purchase_agreement",
+      "odometer_disclosure"
+    ],
+    "customer": {
+      "postal_code": "94560"
+    },
+    "requested_at": "2026-11-03",
+    "attempt": 1
+  },
+  "expected": {
+    "status": "issued",
+    "tag_number": "CA-3F7AABA8",
+    "expires_on": "2027-02-01",
+    "valid_days": 90,
+    "fee_cents": 0,
+    "currency": "USD",
+    "reasons": [
+
+    ],
+    "flags": [
+
+    ]
+  }
+}

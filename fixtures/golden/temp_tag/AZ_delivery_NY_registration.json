@@ -1,0 +1,37 @@
+{
+  "name": "AZ_delivery_NY_registration",
+  "description": "Delivered in AZ, registered in NY: unsupported jurisdiction falls to default 30-day rules",
+  "synthetic": true,
+  "tags": [
+    "legacy_quirk:DEFAULT-RULES-FALLTHROUGH",
+    "needs_sme_review"
+  ],
+  "input": {
+    "vin": "5L1RA1AA0SA000401",
+    "jurisdiction": "NY",
+    "delivery_jurisdiction": "AZ",
+    "purchase_type": "cash",
+    "documents": [
+
+    ],
+    "customer": {
+      "postal_code": "10001"
+    },
+    "requested_at": "2026-11-07",
+    "attempt": 1
+  },
+  "expected": {
+    "status": "issued",
+    "tag_number": "XX-D7DF6216",
+    "expires_on": "2026-12-07",
+    "valid_days": 30,
+    "fee_cents": 0,
+    "currency": "USD",
+    "reasons": [
+
+    ],
+    "flags": [
+      "unsupported_jurisdiction_default_rules"
+    ]
+  }
+}

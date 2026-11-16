@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "temp_tag_rejected.v1.json",
+  "type": "object",
+  "required": ["schema_version", "idempotency_key", "vin", "jurisdiction", "status", "reasons"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "idempotency_key": { "type": "string", "minLength": 1 },
+    "vin": { "type": "string" },
+    "jurisdiction": { "type": "string" },
+    "status": { "const": "rejected" },
+    "fee_cents": { "const": 0 },
+    "reasons": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+    "flags": { "type": "array" }
+  },
+  "additionalProperties": false
+}

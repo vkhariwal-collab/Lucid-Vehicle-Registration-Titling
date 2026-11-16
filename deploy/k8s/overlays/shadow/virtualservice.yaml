@@ -1,0 +1,18 @@
+# Stage 1 - SHADOW: 100% of temp-tag traffic is served by Rails; a copy is mirrored
+# to Go. Mirrored responses are discarded; Go writes only to its own store/outbox
+# with publishing to a shadow subject (no downstream consumers, no DMV/ELT calls).
+apiVersion: networking.istio.io/v1
+kind: VirtualService
+metadata:
+  name: registration-temp-tags
+spec:
+  hosts: [registration.internal]
+  http:
+    - match: [{ uri: { prefix: /temp_tags } }]
+      route:
+        - destination: { host: legacy-registration-rails }
+          weight: 100
+      mirror: { host: temp-tag-svc }
+      mirrorPercentage: { value: 100.0 }
+    - route:
+        - destination: { host: legacy-registration-rails }

@@ -1,0 +1,40 @@
+asyncapi: 2.6.0
+info:
+  title: Temp Tag events (synthetic demo)
+  version: 1.0.0
+  description: >
+    Published by temp-tag-svc via a transactional outbox. Delivery is at-least-once;
+    consumers MUST dedupe on event_id. Per-vehicle ordering is guaranteed by
+    partitioning on VIN (Kafka key / JetStream subject token).
+servers:
+  nats:
+    url: nats://nats:4222
+    protocol: nats
+    description: JetStream stream REGISTRATION, subjects registration.>
+  kafka:
+    url: kafka:9092
+    protocol: kafka
+    description: Alternative profile. Topic registration.temp-tag.v1, key = VIN, 12 partitions.
+channels:
+  registration.temp_tag.issued.v1.{jurisdiction}:
+    parameters:
+      jurisdiction: { schema: { type: string, enum: [CA, TX, ON, XX] } }
+    subscribe:
+      operationId: onTempTagIssued
+      message: { $ref: '#/components/messages/TempTagIssued' }
+  registration.temp_tag.rejected.v1.{jurisdiction}:
+    parameters:
+      jurisdiction: { schema: { type: string } }
+    subscribe:
+      operationId: onTempTagRejected
+      message: { $ref: '#/components/messages/TempTagRejected' }
+  registration.temp_tag.dlq.v1:
+    description: Poison messages after 5 consumer attempts; replay with tools/replay.
+components:
+  messages:
+    TempTagIssued:
+      contentType: application/json
+      payload: { $ref: 'jsonschema/temp_tag_issued.v1.json' }
+    TempTagRejected:
+      contentType: application/json
+      payload: { $ref: 'jsonschema/temp_tag_rejected.v1.json' }

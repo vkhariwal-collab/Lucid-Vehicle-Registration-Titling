@@ -1,0 +1,53 @@
+// Synthetic contract for the demo. Mirrors contracts/jsonschema/*.v1.json.
+syntax = "proto3";
+
+package lucid.registration.v1;
+
+option go_package = "github.com/example/lucid-dmv-migration-demo/gen/lucid/registration/v1;registrationv1";
+
+// Command: POST /v1/temp-tags (Idempotency-Key header required).
+message IssueTempTagRequest {
+  string vin = 1;
+  string jurisdiction = 2;           // registration jurisdiction: CA, TX, ON, ...
+  string delivery_jurisdiction = 3;  // currently ignored by legacy (see spec Q-03)
+  string purchase_type = 4;          // cash | finance | lease
+  Lienholder lienholder = 5;
+  repeated string documents = 6;
+  Customer customer = 7;
+  string requested_at = 8;           // ISO date; injected clock for determinism
+  int32 attempt = 9;
+  string original_issued_at = 10;
+}
+
+message Lienholder {
+  string name = 1;
+  string elt_id = 2;
+}
+
+message Customer {
+  string postal_code = 1;
+}
+
+// Event: subject registration.temp_tag.issued.v1.<JURISDICTION>; partition key = vin.
+message TempTagIssued {
+  string event_id = 1;         // derived from idempotency_key; consumers dedupe on it
+  int32 schema_version = 2;
+  string idempotency_key = 3;
+  string vin = 4;
+  string jurisdiction = 5;
+  string tag_number = 6;
+  string expires_on = 7;
+  int64 fee_cents = 8;
+  string currency = 9;
+  repeated string flags = 10;
+}
+
+// Event: subject registration.temp_tag.rejected.v1.<JURISDICTION>.
+message TempTagRejected {
+  string event_id = 1;
+  int32 schema_version = 2;
+  string idempotency_key = 3;
+  string vin = 4;
+  string jurisdiction = 5;
+  repeated string reasons = 6;
+}

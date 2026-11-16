@@ -1,0 +1,37 @@
+{
+  "name": "CA_expiry_sunday_rollover",
+  "description": "Expiry lands on Sunday -> rolled to Monday",
+  "synthetic": true,
+  "tags": [
+    "legacy_quirk:CA-SUNDAY-ROLL"
+  ],
+  "input": {
+    "vin": "5L1RA1AA0SA000104",
+    "jurisdiction": "CA",
+    "delivery_jurisdiction": "CA",
+    "purchase_type": "cash",
+    "documents": [
+      "purchase_agreement",
+      "odometer_disclosure"
+    ],
+    "customer": {
+      "postal_code": "94105"
+    },
+    "requested_at": "2026-11-02",
+    "attempt": 1
+  },
+  "expected": {
+    "status": "issued",
+    "tag_number": "CA-E9B2562B",
+    "expires_on": "2027-02-01",
+    "valid_days": 90,
+    "fee_cents": 0,
+    "currency": "USD",
+    "reasons": [
+
+    ],
+    "flags": [
+      "expiry_rolled_from_sunday"
+    ]
+  }
+}

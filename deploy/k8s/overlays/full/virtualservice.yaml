@@ -1,0 +1,15 @@
+# Stage 3 - FULL: Go serves 100% of temp-tag issuance; Rails consumes TempTagIssued
+# events to keep its registration record in sync until the next slice moves.
+apiVersion: networking.istio.io/v1
+kind: VirtualService
+metadata:
+  name: registration-temp-tags
+spec:
+  hosts: [registration.internal]
+  http:
+    - match: [{ uri: { prefix: /temp_tags } }]
+      route:
+        - destination: { host: temp-tag-svc }
+          weight: 100
+    - route:
+        - destination: { host: legacy-registration-rails }

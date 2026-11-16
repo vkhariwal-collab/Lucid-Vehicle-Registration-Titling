@@ -1,0 +1,8 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: temp-tag-svc
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels: { app: temp-tag-svc }

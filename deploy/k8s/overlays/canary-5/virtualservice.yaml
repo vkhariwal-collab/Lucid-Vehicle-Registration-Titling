@@ -1,0 +1,18 @@
+# Stage 2 - CANARY: 5% of temp-tag requests served by Go (CA only first).
+# Promotion gate: parity_mismatch_total == 0 for 7 days in shadow + error budget intact.
+# Rollback: set weight back to 0 (route flip, no deploy).
+apiVersion: networking.istio.io/v1
+kind: VirtualService
+metadata:
+  name: registration-temp-tags
+spec:
+  hosts: [registration.internal]
+  http:
+    - match: [{ uri: { prefix: /temp_tags }, headers: { x-jurisdiction: { exact: CA } } }]
+      route:
+        - destination: { host: legacy-registration-rails }
+          weight: 95
+        - destination: { host: temp-tag-svc }
+          weight: 5
+    - route:
+        - destination: { host: legacy-registration-rails }

@@ -1,0 +1,38 @@
+{
+  "name": "ON_lowercase_postal_rejected",
+  "description": "Lower-case postal code rejected (legacy does not normalise)",
+  "synthetic": true,
+  "tags": [
+    "legacy_quirk:ON-POSTAL-CASE",
+    "needs_sme_review"
+  ],
+  "input": {
+    "vin": "5L1RA1AA0SA000303",
+    "jurisdiction": "ON",
+    "delivery_jurisdiction": "ON",
+    "purchase_type": "cash",
+    "documents": [
+      "bill_of_sale",
+      "proof_of_insurance"
+    ],
+    "customer": {
+      "postal_code": "m5v 3l9"
+    },
+    "requested_at": "2026-11-06",
+    "attempt": 1
+  },
+  "expected": {
+    "status": "rejected",
+    "tag_number": null,
+    "expires_on": null,
+    "valid_days": 0,
+    "fee_cents": 0,
+    "currency": null,
+    "reasons": [
+      "invalid_postal_code"
+    ],
+    "flags": [
+
+    ]
+  }
+}

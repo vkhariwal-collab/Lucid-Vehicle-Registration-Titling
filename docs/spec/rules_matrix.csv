@@ -1,0 +1,15 @@
+jurisdiction,purchase_type,lienholder,documents_complete,postal_ok,attempt,expected_status,expected_reasons_or_flags,valid_days,fee_cents,currency,quirk
+CA,cash,none,yes,n/a,1,issued,,90,0,USD,
+CA,finance,elt_id present,yes,n/a,1,issued,,90,0,USD,
+CA,lease,name only,yes,n/a,1,rejected,elt_lienholder_required,0,0,,
+CA,cash,none,yes,n/a,1,issued,expiry_rolled_from_sunday (when expiry is Sunday),90,0,USD,CA-SUNDAY-ROLL
+CA,finance,elt_id present,missing odometer+lien_agreement,n/a,1,rejected,missing_document:odometer_disclosure;missing_document:lien_agreement,0,0,,
+TX,finance,name present,yes,n/a,1,issued,,60,500,USD,
+TX,cash,none,yes,n/a,2+,issued,resubmission (expiry from new request date),60,500,USD,TX-RESUBMIT-EXPIRY
+TX,finance,blank name,yes,n/a,1,rejected,lienholder_required,0,0,,
+ON,cash,none,yes,upper-case,1,issued,,10,3200,CAD,
+ON,finance,name present,yes,upper-case,1,issued,ppsa_registration_required,10,3200,CAD,
+ON,lease,name present,yes,upper-case,1,issued,ppsa_registration_required;lessor_owned,10,3200,CAD,
+ON,cash,none,yes,lower-case,1,rejected,invalid_postal_code,0,0,,ON-POSTAL-CASE
+NY (any unsupported),cash,none,n/a,n/a,1,issued,unsupported_jurisdiction_default_rules,30,0,USD,DEFAULT-RULES-FALLTHROUGH
+any,any,any,any,any,any,rejected,invalid_vin (short-circuit),0,0,,

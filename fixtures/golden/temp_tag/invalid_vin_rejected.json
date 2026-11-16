@@ -1,0 +1,37 @@
+{
+  "name": "invalid_vin_rejected",
+  "description": "VIN containing letter O -> rejected before any rule lookup",
+  "synthetic": true,
+  "tags": [
+
+  ],
+  "input": {
+    "vin": "5L1RA1AA0SAO00001",
+    "jurisdiction": "CA",
+    "delivery_jurisdiction": "CA",
+    "purchase_type": "cash",
+    "documents": [
+      "purchase_agreement",
+      "odometer_disclosure"
+    ],
+    "customer": {
+      "postal_code": "94560"
+    },
+    "requested_at": "2026-11-02",
+    "attempt": 1
+  },
+  "expected": {
+    "status": "rejected",
+    "tag_number": null,
+    "expires_on": null,
+    "valid_days": 0,
+    "fee_cents": 0,
+    "currency": null,
+    "reasons": [
+      "invalid_vin"
+    ],
+    "flags": [
+
+    ]
+  }
+}

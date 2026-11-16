@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "temp_tag_issued.v1.json",
+  "type": "object",
+  "required": ["schema_version", "idempotency_key", "vin", "jurisdiction", "status", "tag_number", "expires_on", "fee_cents", "currency", "reasons", "flags"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "idempotency_key": { "type": "string", "minLength": 1 },
+    "vin": { "type": "string", "pattern": "^[A-HJ-NPR-Z0-9]{17}$" },
+    "jurisdiction": { "type": "string" },
+    "status": { "const": "issued" },
+    "tag_number": { "type": "string", "pattern": "^[A-Z]{2}-[0-9A-F]{8}$" },
+    "expires_on": { "type": "string", "format": "date" },
+    "fee_cents": { "type": "integer", "minimum": 0 },
+    "currency": { "enum": ["USD", "CAD"] },
+    "reasons": { "type": "array", "maxItems": 0 },
+    "flags": { "type": "array", "items": { "type": "string" } }
+  },
+  "additionalProperties": false
+}
