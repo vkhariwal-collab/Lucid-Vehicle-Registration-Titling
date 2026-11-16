@@ -50,6 +50,11 @@ Evaluation order (it matters, because reasons are returned in this order):
 5. Expiry = `base_date + valid_days`, then the jurisdiction adjustment (`:16`).
 6. Tag number = `<CODE>-` + first 8 hex chars of `SHA256("vin:jurisdiction:attempt")`, upper-cased (`:31-33`).
 
+Input handling (affects the result even though no rule mentions it):
+- `attempt` defaults to 1 only when it is missing or `null` (`@attempt ||= 1`, `registration.rb:11`). An explicit `0` is kept and goes into the tag hash as `:0`. Fixture `CA_attempt_zero`.
+- `requested_at` is read with Ruby `Date.parse` (`registration.rb:24-26`). For an ISO date-time it keeps the calendar date **as written** and ignores the time and UTC offset (`2026-11-25T23:30:00-08:00` → `2026-11-25`). Fixture `CA_requested_at_datetime`. ⚠️ Q-07
+- Blank-name checks use Ruby `String#strip` (`tx_rules.rb:16`), which removes only NUL, `\t`, `\n`, `\v`, `\f`, `\r` and space. A name of only U+00A0 counts as present; a name of only NUL counts as blank. Fixtures `TX_lienholder_name_nbsp`, `TX_lienholder_name_nul`. Verified on Ruby 3.0.2; confirm against the production Ruby version.
+
 | Rule | CA | TX | ON | Default (any other) |
 |---|---|---|---|---|
 | Valid days | 90 (`ca_rules.rb:4`) | 60 (`tx_rules.rb:4`) | 10 (`on_rules.rb:6`) | 30 (`base_rules.rb:4`) |
@@ -69,6 +74,8 @@ Evaluation order (it matters, because reasons are returned in this order):
 | Q-04 ⚠️ | ON postal code check is case-sensitive: `m5v 3l9` is rejected | `on_rules.rb:3` | Avoidable rejections and delivery delay | `ON_lowercase_postal_rejected` |
 | Q-05 ⚠️ | `manual_review` is a dead-end state: no transition leaves it | `registration_state_machine.rb:4-13` | Registrations stuck without an SLA | state-machine spec |
 | Q-06 | Temp tags are not idempotent: a retry issues a new tag record (the deterministic tag number hides it) | `temp_tag_issuer.rb` (no persistence/key) | Duplicate records downstream | fixed in Go by design (ADR 0001) |
+| Q-07 ⚠️ | `requested_at` date-times keep the local calendar date and drop the offset, so the same instant can expire on different days depending on how the caller formats it | `registration.rb:24-26` | Off-by-one expiry near midnight | `CA_requested_at_datetime` |
+| Q-08 ⚠️ | `Date.parse` also accepts non-ISO formats (`2026/11/25`, `20261125`, `Nov 25 2026`, text around a date). The Go port accepts only ISO dates and ISO date-times and returns an error for the rest. Need to confirm what callers actually send | `registration.rb:25` | Go returns errors where legacy issued a tag | none (not ported) |
 
 ## 4. Sign-off
 | Section | Owner | Signed |
@@ -76,4 +83,4 @@ Evaluation order (it matters, because reasons are returned in this order):
 | CA rules | DMV Ops (CA) | ☐ |
 | TX rules | DMV Ops (TX) | ☐ |
 | ON rules | DMV Ops (Canada) | ☐ |
-| Q-01 … Q-06 decisions | DMV Ops + Legal | ☐ |
+| Q-01 … Q-08 decisions | DMV Ops + Legal | ☐ |

@@ -31,7 +31,7 @@ func main() {
 	minParity := flag.Float64("min", 1.0, "minimum parity ratio required to exit 0")
 	flag.Parse()
 
-	reqs := generate(*n, *seed)
+	reqs, edges := generate(*n, *seed)
 	legacyOut, err := runLegacy(*legacy, reqs)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "legacy:", err)
@@ -68,6 +68,7 @@ func main() {
 	var b strings.Builder
 	fmt.Fprintf(&b, "# Parity report: legacy Ruby vs Go temp-tag-svc\n\n")
 	fmt.Fprintf(&b, "- Generated: %s\n- Requests: %d (seed %d, synthetic)\n- Go options: FixTXResubmissionExpiry=%v\n", time.Now().UTC().Format(time.RFC3339), len(reqs), *seed, *fixTX)
+	fmt.Fprintf(&b, "- Edge-case inputs: %s\n", edgeSummary(edges))
 	fmt.Fprintf(&b, "- **Parity: %d/%d (%.2f%%)**\n\n", len(reqs)-len(diffs), len(reqs), ratio*100)
 	fmt.Fprintf(&b, "| Jurisdiction | Requests | Mismatches |\n|---|---|---|\n")
 	jurs := make([]string, 0, len(byJur))
@@ -104,8 +105,12 @@ func main() {
 	}
 }
 
-func generate(n int, seed int64) []model.Request {
+// generate returns n synthetic requests and how many of each edge case it injected.
+// Edge cases use their own RNG so the base request stream stays the same for a given seed.
+func generate(n int, seed int64) ([]model.Request, map[string]int) {
 	rng := rand.New(rand.NewSource(seed))
+	edge := rand.New(rand.NewSource(seed + 1))
+	edges := map[string]int{}
 	jurs := []string{"CA", "CA", "CA", "TX", "TX", "ON", "NY", "WA"}
 	types := []string{"cash", "finance", "lease"}
 	docs := map[string][]string{
@@ -156,9 +161,41 @@ func generate(n int, seed int64) []model.Request {
 			r.RequestedAt = orig.AddDate(0, 0, 5+rng.Intn(30)).Format("2006-01-02")
 			r.Attempt = 2 + rng.Intn(2)
 		}
+		addEdgeCases(&r, edge, edges)
 		out[i] = r
 	}
-	return out
+	return out, edges
+}
+
+func addEdgeCases(r *model.Request, rng *rand.Rand, seen map[string]int) {
+	if r.Attempt == 1 && rng.Float64() < 0.04 {
+		r.Attempt = 0
+		seen["attempt=0"]++
+	}
+	if rng.Float64() < 0.08 {
+		r.RequestedAt += []string{"T23:30:00Z", "T00:15:00-08:00", "T09:00:00+14:00", " 12:00"}[rng.Intn(4)]
+		seen["requested_at with time"]++
+	}
+	if r.Lienholder != nil && rng.Float64() < 0.08 {
+		r.Lienholder.Name = []string{"\u00a0", "\x00", " \t\r\n", "\u3000"}[rng.Intn(4)]
+		seen["lienholder name whitespace-only"]++
+	}
+}
+
+func edgeSummary(m map[string]int) string {
+	if len(m) == 0 {
+		return "none"
+	}
+	keys := make([]string, 0, len(m))
+	for k := range m {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	parts := make([]string, len(keys))
+	for i, k := range keys {
+		parts[i] = fmt.Sprintf("%s=%d", k, m[k])
+	}
+	return strings.Join(parts, ", ")
 }
 
 func runLegacy(path string, reqs []model.Request) ([]map[string]any, error) {

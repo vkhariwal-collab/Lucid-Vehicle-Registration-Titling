@@ -1,0 +1,41 @@
+{
+  "name": "TX_lienholder_name_nul",
+  "description": "Lienholder name is a single NUL: String#strip removes it, so the name counts as blank",
+  "synthetic": true,
+  "tags": [
+    "legacy_quirk:RUBY-STRIP-WHITESPACE"
+  ],
+  "input": {
+    "vin": "5L1RA1AA0SA000204",
+    "jurisdiction": "TX",
+    "delivery_jurisdiction": "TX",
+    "purchase_type": "finance",
+    "lienholder": {
+      "name": "\u0000"
+    },
+    "documents": [
+      "purchase_agreement",
+      "form_130u",
+      "lien_agreement"
+    ],
+    "customer": {
+      "postal_code": "78701"
+    },
+    "requested_at": "2026-11-25",
+    "attempt": 1
+  },
+  "expected": {
+    "status": "rejected",
+    "tag_number": null,
+    "expires_on": null,
+    "valid_days": 0,
+    "fee_cents": 0,
+    "currency": null,
+    "reasons": [
+      "lienholder_required"
+    ],
+    "flags": [
+
+    ]
+  }
+}

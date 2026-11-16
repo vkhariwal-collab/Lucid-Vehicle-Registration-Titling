@@ -1,0 +1,37 @@
+{
+  "name": "CA_attempt_zero",
+  "description": "Explicit attempt 0 is kept (only nil defaults to 1), so it feeds the tag hash",
+  "synthetic": true,
+  "tags": [
+    "legacy_quirk:ATTEMPT-ZERO-KEPT"
+  ],
+  "input": {
+    "vin": "5L1RA1AA0SA000106",
+    "jurisdiction": "CA",
+    "delivery_jurisdiction": "CA",
+    "purchase_type": "cash",
+    "documents": [
+      "purchase_agreement",
+      "odometer_disclosure"
+    ],
+    "customer": {
+      "postal_code": "94105"
+    },
+    "requested_at": "2026-11-25",
+    "attempt": 0
+  },
+  "expected": {
+    "status": "issued",
+    "tag_number": "CA-C916F564",
+    "expires_on": "2027-02-23",
+    "valid_days": 90,
+    "fee_cents": 0,
+    "currency": "USD",
+    "reasons": [
+
+    ],
+    "flags": [
+
+    ]
+  }
+}

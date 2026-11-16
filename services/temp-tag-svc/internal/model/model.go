@@ -3,6 +3,7 @@
 package model
 
 import (
+	"encoding/json"
 	"fmt"
 	"time"
 )
@@ -31,6 +32,24 @@ type Request struct {
 	OriginalIssuedAt     string      `json:"original_issued_at,omitempty"`
 }
 
+// UnmarshalJSON defaults a missing or null attempt to 1 but keeps an explicit 0,
+// mirroring legacy `@attempt ||= 1` (registration.rb:11).
+func (r *Request) UnmarshalJSON(b []byte) error {
+	type plain Request
+	aux := struct {
+		*plain
+		Attempt *int `json:"attempt"`
+	}{plain: (*plain)(r)}
+	if err := json.Unmarshal(b, &aux); err != nil {
+		return err
+	}
+	r.Attempt = 1
+	if aux.Attempt != nil {
+		r.Attempt = *aux.Attempt
+	}
+	return nil
+}
+
 func (r Request) Financed() bool { return r.PurchaseType == "finance" || r.PurchaseType == "lease" }
 
 type Result struct {
@@ -44,8 +63,19 @@ type Result struct {
 	Flags     []string `json:"flags"`
 }
 
+// ParseDate accepts an ISO date, optionally followed by a time part ("T", "t" or
+// " " then anything). Like legacy Date.parse (registration.rb:25) it keeps the
+// calendar date as written and ignores the time and offset. Other formats that
+// Date.parse accepts (e.g. "2026/11/25", "Nov 25 2026") are not supported.
 func ParseDate(s string) (time.Time, error) {
-	t, err := time.Parse(dateLayout, s)
+	d := s
+	if len(s) > len(dateLayout) {
+		switch s[len(dateLayout)] {
+		case 'T', 't', ' ':
+			d = s[:len(dateLayout)]
+		}
+	}
+	t, err := time.Parse(dateLayout, d)
 	if err != nil {
 		return time.Time{}, fmt.Errorf("parse date %q: %w", s, err)
 	}
